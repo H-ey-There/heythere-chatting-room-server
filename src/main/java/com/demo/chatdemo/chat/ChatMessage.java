@@ -1,19 +1,13 @@
 package com.demo.chatdemo.chat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-import java.io.Serializable;
-
+@ToString
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class ChatMessage implements Serializable {
+public class ChatMessage {
     // 메시지 타입 : 입장, 채팅
     private MessageType type; // 메시지 타입
     private String roomId; // 방번호
@@ -22,5 +16,5 @@ public class ChatMessage implements Serializable {
 }
 
 enum MessageType {
-    ENTER, TALK
+    ENTER, TALK, EXIT, HOST
 }
