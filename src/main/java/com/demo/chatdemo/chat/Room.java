@@ -19,7 +19,6 @@ public class Room {
     private String roomId;
     private String name;
     private String host;
-    private List<User> users = new ArrayList<>();
 
 //    public static Room create(String name) {
 //        return Room.builder()

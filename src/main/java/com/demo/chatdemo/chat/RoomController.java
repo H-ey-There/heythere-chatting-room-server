@@ -3,7 +3,6 @@ package com.demo.chatdemo.chat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +24,16 @@ public class RoomController {
     @GetMapping("/rooms")
     @ResponseBody
     public List<Room> room() {
-//        return chatRoomRepository.findAllRoom();
        log.info(String.valueOf(roomRepository.findAll()));
+
         return (List<Room>) roomRepository.findAll();
     }
 
     // 채팅방 생성
     @MessageMapping("/room")
 //    @SendTo("/sub/room/")
-    public void room(Room room){
+    public void room(@RequestBody Room room){
         roomRepository.save(room);
-        System.out.println(room.getHost());
         messagingTemplate.convertAndSend("/sub/room/", room);
     }
 
@@ -45,20 +43,10 @@ public class RoomController {
     @ResponseBody
     public Room roomInfo(@PathVariable String roomId) {
 //        return chatRoomRepository.findRoomById(roomId);
-        return roomRepository.findById(roomId).get();
+        if (roomId != null){
+            return roomRepository.findById(roomId).orElse(Room.builder().build());
+        }
+        return null;
     }
 
-
-
-
-    //    @PostMapping("/room")
-//    @ResponseBody
-//    public Room createRoom(@RequestParam String name) {
-////        return chatRoomRepository.createChatRoom(name);
-//        return roomRepository.save(
-//                Room.builder().
-//                        name(name).
-//                        roomId(UUID.randomUUID().toString()).
-//                        build());
-//    }
 }
