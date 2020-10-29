@@ -37,27 +37,22 @@ function Chat(){
     
     const recvMessage = (recv) => {
         updateRoom()
-
-        if (recv.type === 'HOST'){
+        if (recv.type === 'QUIT'){
             setRoomId('')
             return
         }
         setMsg([
             {
-                "type":recv.type,
-                "sender":(recv.type === 'ENTER' || recv.type === 'EXIT')  ? '[알림]' : recv.sender,
                 "message":recv.message
-            },
-            ...msg])
-        setCount(recv.count);
-        console.log(count)
+            }, ...msg])
+        // setCount(recv.count);
     }
 
     const sendMessage = (e) => {
         if (chat !== ''){
             $websocket.current.sendMessage (
                 '/pub/chat/message',
-                JSON.stringify({type:'TALK', roomId:roomId, sender:sender.userId, message:chat}),
+                JSON.stringify({type:'TALK', roomId:roomId, message:`${sender.name} : ${chat}` }),
                 {'Content-Type': 'application/json'}
             )
         }
@@ -71,12 +66,12 @@ function Chat(){
         if (room.host === sender.userId) {
             $websocket.current.sendMessage(
                 '/pub/chat/message',
-                JSON.stringify({type: 'HOST', roomId: roomId, sender: sender.userId, message: ''}),
+                JSON.stringify({type: 'QUIT', roomId: roomId, message: ''}),
                 {'Content-Type': 'application/json'})
         }else {
             $websocket.current.sendMessage(
                 '/pub/chat/message',
-                JSON.stringify({type: 'EXIT', roomId: roomId, sender: sender.userId, message: ''}),
+                JSON.stringify({type: 'TALK', roomId: roomId, message: sender.name+'이 퇴장하셨습니다.'}),
                 {'Content-Type': 'application/json'})
         }
         setRoomId('')
@@ -97,11 +92,8 @@ function Chat(){
 
             <div>
                 <ul>
-                    {msg.map(m => <li>{m.sender}: {m.message}</li>)}
+                    {msg.map(m => <li>{m.message}</li>)}
                 </ul>
-            </div>
-            <div>
-                시청자수 : {count}
             </div>
 
             <SockJsClient 
@@ -110,7 +102,7 @@ function Chat(){
                 onConnect={()=>{
                     $websocket.current.sendMessage (
                         '/pub/chat/message',
-                        JSON.stringify({type:'ENTER', roomId:roomId, sender:sender.userId, message:''}),
+                        JSON.stringify({type:'TALK', roomId:roomId, message:sender.name+'이 입장하였습니다.'}),
                         {'Content-Type': 'application/json'}
                     )
                 }}
@@ -122,5 +114,4 @@ function Chat(){
 
 
 export default Chat
-
 

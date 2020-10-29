@@ -1,0 +1,4 @@
+[2020-10-30 06:24:30,737] INFO Starting the log cleaner (kafka.log.LogCleaner)
+[2020-10-30 06:24:30,941] INFO [kafka-log-cleaner-thread-0]: Starting (kafka.log.LogCleaner)
+[2020-10-30 06:31:41,160] INFO The cleaning for partition quickstart-events-0 is aborted and paused (kafka.log.LogCleaner)
+[2020-10-30 06:31:41,161] INFO The cleaning for partition quickstart-events-0 is aborted (kafka.log.LogCleaner)
