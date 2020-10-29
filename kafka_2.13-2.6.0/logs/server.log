@@ -46,3 +46,4 @@
 [2020-10-30 08:32:42,794] INFO [GroupCoordinator 0]: Member[group.instance.id None, member.id consumer-main-listener-1-b269ec44-3fc5-454b-a68d-668de1c225e0] in group main-listener has left, removing it from the group (kafka.coordinator.group.GroupCoordinator)
 [2020-10-30 08:32:42,797] INFO [GroupCoordinator 0]: Preparing to rebalance group main-listener in state PreparingRebalance with old generation 37 (__consumer_offsets-42) (reason: removing member consumer-main-listener-1-b269ec44-3fc5-454b-a68d-668de1c225e0 on LeaveGroup) (kafka.coordinator.group.GroupCoordinator)
 [2020-10-30 08:32:42,797] INFO [GroupCoordinator 0]: Group main-listener with generation 38 is now empty (__consumer_offsets-42) (kafka.coordinator.group.GroupCoordinator)
+[2020-10-30 08:34:31,894] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 2 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
