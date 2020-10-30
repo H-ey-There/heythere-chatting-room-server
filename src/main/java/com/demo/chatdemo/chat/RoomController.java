@@ -16,7 +16,6 @@ import java.util.List;
 @RequestMapping("/chat")
 public class RoomController {
 
-//    private final ChatRoomRepository chatRoomRepository;
     private final RoomRepository roomRepository;
     private final SimpMessageSendingOperations messagingTemplate;
 
@@ -25,8 +24,7 @@ public class RoomController {
     @ResponseBody
     public List<Room> room() {
        log.info(String.valueOf(roomRepository.findAll()));
-
-        return (List<Room>) roomRepository.findAll();
+       return (List<Room>) roomRepository.findAll();
     }
 
     // 채팅방 생성

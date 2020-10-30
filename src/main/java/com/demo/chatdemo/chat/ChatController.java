@@ -19,6 +19,7 @@ import java.util.HashMap;
 @CrossOrigin
 @RestController
 public class ChatController {
+    static final String DEFAULT_CHATTING_TOPIC = "chatting";
 
     private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -27,10 +28,10 @@ public class ChatController {
 
     @MessageMapping("/chat/message")
     public void message(ChatMessage message){
-        kafkaTemplate.send("chatting", message.getRoomId(), message.message());
+        kafkaTemplate.send(DEFAULT_CHATTING_TOPIC, message.getRoomId(), message.message());
     }
 
-    @KafkaListener(id = "main-listener", topics = "chatting")
+    @KafkaListener(id = "main-listener", topics = DEFAULT_CHATTING_TOPIC)
     public void receive(ChatMessage message,
                         @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key) throws Exception {
 
@@ -40,7 +41,7 @@ public class ChatController {
             roomRepository.delete(room);
             messagingTemplate.convertAndSend("/sub/room/", "room deleted");
         }
-        messagingTemplate.convertAndSend("/sub/chat/room/"+key, message);
+        messagingTemplate.convertAndSend("/sub/chat/room/" + key, message);
     }
 
 }

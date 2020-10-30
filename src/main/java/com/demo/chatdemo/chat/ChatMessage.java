@@ -10,15 +10,13 @@ public class ChatMessage {
     private MessageType type; // 메시지 타입
     private String roomId; // 방번호
     private String message; // 메시지
-    private Long count;
+//    private Long count;
 
     public ChatMessage message(){
         this.roomId = "hidden";
         return this;
     }
 }
-
-
 
 enum MessageType {
     QUIT, TALK

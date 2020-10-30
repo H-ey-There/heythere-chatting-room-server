@@ -20,7 +20,7 @@ public class KafkaConfig {
     //Sender config
     @Bean
     public ProducerFactory<String, ChatMessage> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs(), null, new JsonSerializer<ChatMessage>());
+        return new DefaultKafkaProducerFactory<>(producerConfigs(), null, new JsonSerializer<>());
     }
 
     @Bean
@@ -35,6 +35,7 @@ public class KafkaConfig {
                 .put("bootstrap.servers", "localhost:9092")//kafka server ip & port
                 .put("key.serializer", StringSerializer.class)
                 .put("value.serializer", JsonSerializer.class)//Object json parser
+                .put("group.id", "spring-boot-test") // chatting  group id
                 .build();
     }
     //Receiver config
@@ -56,6 +57,7 @@ public class KafkaConfig {
                 .put("bootstrap.servers", "localhost:9092")
                 .put("key.deserializer", StringDeserializer.class)
                 .put("value.deserializer", JsonDeserializer.class)
+                .put("group.id", "spring-boot-test")
                 .build();
     }
 }
