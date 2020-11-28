@@ -1,47 +1,61 @@
 package com.demo.chatdemo.chat;
 
+import com.demo.chatdemo.room.Room;
+import com.demo.chatdemo.room.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.kafka.support.converter.KafkaMessageHeaders;
-import org.springframework.messaging.handler.annotation.Header;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
 
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin
 @RestController
 public class ChatController {
-    static final String DEFAULT_CHATTING_TOPIC = "chatting";
+    //    private final ChatProducer producer;
 
-    private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
     private final RoomRepository roomRepository;
     private final UserSessionRepository userSessionRepository;
 
     @MessageMapping("/chat/message")
-    public void message(ChatMessage message){
-        kafkaTemplate.send(DEFAULT_CHATTING_TOPIC, message.getRoomId(), message.message());
-    }
+    public void message(ChatMessage message) throws Exception {
 
-    @KafkaListener(id = "main-listener", topics = DEFAULT_CHATTING_TOPIC)
-    public void receive(ChatMessage message,
-                        @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key) throws Exception {
+
+        Room room = roomRepository.findById(message.getRoomId())
+                .orElseThrow(Exception::new);
+
+        System.out.println("message :" + message.getUserId());
+        System.out.println("hostId : " + room.getHost());
 
         if (MessageType.QUIT.equals(message.getType())) {
-            Room room = roomRepository.findById(key)
-                    .orElseThrow(Exception::new);
             roomRepository.delete(room);
+            System.out.println("room Deleted");
             messagingTemplate.convertAndSend("/sub/room/", "room deleted");
         }
-        messagingTemplate.convertAndSend("/sub/chat/room/" + key, message);
+
+        if (MessageType.ENTER.equals(message.getType())){
+            userSessionRepository.save(UserSession.
+                    builder().
+                    userId(message.getUserId()).
+                    roomId(message.getRoomId()).
+                    build()
+            );
+        }
+
+        if (MessageType.EXIT.equals(message.getType())){
+            userSessionRepository.deleteByUserId(message.getUserId());
+        }
+
+        message.setCount(
+                userSessionRepository.countAllByRoomId(
+                        message.getRoomId()));
+        room.setCount(message.getCount());
+        roomRepository.save(room);
+        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
     }
 
 }

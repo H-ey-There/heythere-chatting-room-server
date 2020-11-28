@@ -1,12 +1,16 @@
-package com.demo.chatdemo.chat;
+package com.demo.chatdemo.room;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -24,7 +28,7 @@ public class RoomController {
     @ResponseBody
     public List<Room> room() {
        log.info(String.valueOf(roomRepository.findAll()));
-       return (List<Room>) roomRepository.findAll();
+       return roomRepository.findAll();
     }
 
     // 채팅방 생성
@@ -35,16 +39,16 @@ public class RoomController {
         messagingTemplate.convertAndSend("/sub/room/", room);
     }
 
-
     // 특정 채팅방 조회
     @GetMapping("/room/{roomId}")
     @ResponseBody
-    public Room roomInfo(@PathVariable String roomId) {
+    public ResponseEntity<?> roomInfo(@PathVariable String roomId){
 //        return chatRoomRepository.findRoomById(roomId);
         if (roomId != null){
-            return roomRepository.findById(roomId).orElse(Room.builder().build());
+            return new ResponseEntity<>(roomRepository.findById(roomId), HttpStatus.OK);
         }
         return null;
     }
+
 
 }

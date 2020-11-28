@@ -1,23 +1,24 @@
 import Axios from 'axios';
 import React, {useState, useEffect, useRef} from 'react';
-import {useRecoilState, useSetRecoilState} from 'recoil';
-import {RoomId, Sender} from '../atoms'
 import SockJsClient from 'react-stomp'
 
 const GET_ROOM_URL = 'http://localhost:8087/chat/rooms'
 const USER_URL = 'http://localhost:8087/user/'
 
-function Room() {
+function Room(props) {
     const $websocket = useRef(null)
 
-    const [sender, setSender] = useRecoilState(Sender)
     const [roomList, setRoomList] = useState([])
     const [roomName, setRoomName] = useState('')
-    const setRoomId = useSetRecoilState(RoomId)
+
+    const setRoomId = props.setRoomId;
+    const sender = props.sender;
+    const setSender = props.setSender;
 
     const fetchData = async () => {
         const response = await Axios.get(GET_ROOM_URL);
-        if (response.data == null){
+        if (response.data == null || response.data === []){
+            setRoomList([])
             return
         }
         setRoomList(
@@ -34,9 +35,7 @@ function Room() {
             name : name
             }
         ).then(response=> {
-            setSender(
-                response.data
-            );
+            setSender(response.data);
         });
 
     }
@@ -49,14 +48,13 @@ function Room() {
         setRoomName(e.target.value);
     };
 
-    const createRoom = () => {
+    const createRoom = async () => {
 
         if (roomName === '') {
-            alert('이름을 입력하세요!')
-            return
+             setRoomName(sender.name + '의 방송')
         }
 
-        $websocket.current.sendMessage(
+        await $websocket.current.sendMessage(
             "/pub/room",
             JSON.stringify({name: roomName, host: sender.userId}),
             {'Content-Type': 'application/json'})
@@ -76,7 +74,7 @@ function Room() {
                         }
                     }}/>
                 </label>
-                <button onClick={createRoom}>개설</button>
+                <button onClick={createRoom}>방송시작</button>
                 </>
             }
             <ul>
@@ -88,7 +86,7 @@ function Room() {
                 onMessage={
                     (msg) => {
                         if (sender.userId === msg.host)
-                            setRoomId(msg.roomId)
+                            setRoomId(msg.roomId);
                         fetchData()
                     }
                 }

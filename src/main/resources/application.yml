@@ -2,11 +2,11 @@ spring:
   application:
     name: heythere-chatting-room-server
 
-  profiles:
-    active: local
-  redis:
-    host: localhost
-    port: 6379
+#  profiles:
+#    active: local
+#  redis:
+#    host: localhost
+#    port: 6379
 
 
 #  devtools:
@@ -34,14 +34,15 @@ server:
 #        max-file-size: 10MB
 #        max-request-size: 10MB
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://0.0.0.0:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-management:
-  endpoints:
-    web:
-      exposure:
-        include: hystrix.stream
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://0.0.0.0:8761/eureka/
+#    register-with-eureka: true
+#    fetch-registry: true
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: hystrix.stream

@@ -1,18 +1,23 @@
-import React from 'react'
+import React, {useState} from 'react'
 import Chat from './components/Chat';
 import Room from './components/Room';
-import { useRecoilValue } from 'recoil';
-import {RoomId} from './atoms'
 import './App.css';
 
-
 function App(){
-  const roomId = useRecoilValue(RoomId)
+  const [roomId,setRoomId] = useState('');
+  const [sender, setSender] = useState(
+      {
+        userId:'',
+        name:'GUEST'
+      }
+  )
   return (
     <div className="App">
       {roomId !== '' ? 
-      <Chat/>
-      : <Room/>}
+      <Chat roomId={roomId} setRoomId={setRoomId}
+            sender={sender}/>
+      : <Room setRoomId={setRoomId}
+              sender={sender} setSender={setSender}/>}
     </div>
   )
 }

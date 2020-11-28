@@ -3,13 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { RecoilRoot } from 'recoil';
 
 ReactDOM.render(
   <React.StrictMode>
-        <RecoilRoot>
-          <App />
-        </RecoilRoot>
+      <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

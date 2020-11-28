@@ -1,20 +1,19 @@
 import React, { useState, useEffect, useRef} from 'react'
 import Axios from 'axios';
-import {useRecoilState, useRecoilValue} from 'recoil';
-import {RoomId, Sender} from '../atoms'
 import SockJsClient from 'react-stomp'
 
-function Chat(){
+const Chat = (props) =>{
     let $websocket = useRef(null);
 
-    const [roomId, setRoomId] = useRecoilState(RoomId)
-    const sender = useRecoilValue(Sender);
+    const roomId = props.roomId;
+    const setRoomId = props.setRoomId;
+    const sender = props.sender;
 
     const [chat, setChat] = useState('')
     const [room, setRoom] = useState({
         host: '',
         users: [],
-        name: '',
+        name: ''
     })
 
     const [count, setCount] = useState(0);
@@ -28,7 +27,6 @@ function Chat(){
                     setRoom(res.data)
                 });
         }
-
     }
 
     useEffect(()=>{
@@ -38,9 +36,10 @@ function Chat(){
     const recvMessage = (recv) => {
         updateRoom()
         if (recv.type === 'QUIT'){
-            setRoomId('')
+            setRoomId('');
             return
         }
+        setCount(recv.count)
         setMsg([
             {
                 "message":recv.message
@@ -52,10 +51,12 @@ function Chat(){
         if (chat !== ''){
             $websocket.current.sendMessage (
                 '/pub/chat/message',
-                JSON.stringify({type:'TALK', roomId:roomId, message:`${sender.name} : ${chat}` }),
+                JSON.stringify({type:'TALK', roomId:roomId, message:`${sender.name} : ${chat}` , userId:sender.userId
+                }),
                 {'Content-Type': 'application/json'}
             )
         }
+        setChat('')
     }
 
     const onChange = (e) => {
@@ -66,12 +67,12 @@ function Chat(){
         if (room.host === sender.userId) {
             $websocket.current.sendMessage(
                 '/pub/chat/message',
-                JSON.stringify({type: 'QUIT', roomId: roomId, message: ''}),
+                JSON.stringify({type: 'QUIT', roomId: roomId, message: '', userId:sender.userId}),
                 {'Content-Type': 'application/json'})
         }else {
             $websocket.current.sendMessage(
                 '/pub/chat/message',
-                JSON.stringify({type: 'TALK', roomId: roomId, message: sender.name+'이 퇴장하셨습니다.'}),
+                JSON.stringify({type: 'EXIT', roomId: roomId, message: sender.name+'이 퇴장하셨습니다.', userId:sender.userId}),
                 {'Content-Type': 'application/json'})
         }
         setRoomId('')
@@ -82,9 +83,11 @@ function Chat(){
             <button onClick={exit}>뒤로가기</button>
 
             <h1>방제 : {room.name}</h1>
+            <h2>시청자수 : {count}</h2>
             <h2>나 : {sender.name}</h2>
 
-            <input type="text" name="name"  onKeyUp={onChange} placeholder="여기에 메세지 입력" 
+            <input type="text" name="name"  onChange={onChange} placeholder="여기에 메세지 입력"
+                   value={chat}
                 onKeyPress={e => {if (e.key === "Enter"){
                     sendMessage(e)
                 }}}/>
@@ -102,7 +105,7 @@ function Chat(){
                 onConnect={()=>{
                     $websocket.current.sendMessage (
                         '/pub/chat/message',
-                        JSON.stringify({type:'TALK', roomId:roomId, message:sender.name+'이 입장하였습니다.'}),
+                        JSON.stringify({type:'ENTER', roomId:roomId, message:sender.name+'이 입장하였습니다.', userId:sender.userId}),
                         {'Content-Type': 'application/json'}
                     )
                 }}

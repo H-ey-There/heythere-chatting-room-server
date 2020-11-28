@@ -1,9 +1,6 @@
 package com.demo.chatdemo.user;
 
-import com.demo.chatdemo.user.User;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.Optional;
-
-public interface UserRepository extends CrudRepository<User, String> {
+public interface UserRepository extends MongoRepository<User, String> {
 }
